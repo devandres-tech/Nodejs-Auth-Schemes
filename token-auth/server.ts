@@ -1,5 +1,15 @@
 import express from 'express'
+import dotenv from 'dotenv'
 import cors from 'cors'
+import db from './models'
+import dbConfig from './config/db.config'
+const Role = db.role
+
+if (process.env.NODE_ENV !== 'production') {
+  dotenv.config()
+}
+
+// db.mongoose.connect(``)
 
 const app = express()
 const corsOption = {
