@@ -9,7 +9,53 @@ if (process.env.NODE_ENV !== 'production') {
   dotenv.config()
 }
 
-// db.mongoose.connect(``)
+function initial() {
+  Role.estimatedDocumentCount((err: any, count: number) => {
+    if (!err && count === 0) {
+      new Role({
+        name: 'user',
+      }).save((err: Error) => {
+        if (err) {
+          console.log('error', err)
+        }
+        console.log("added 'user' to roles collection")
+      })
+      new Role({
+        name: 'moderator',
+      }).save((err: Error) => {
+        if (err) {
+          console.log('error', err)
+        }
+        console.log("added 'moderator' to roles collection")
+      })
+      new Role({
+        name: 'admin',
+      }).save((err: Error) => {
+        if (err) {
+          console.log('error', err)
+        }
+        console.log("added 'admin' to roles collection")
+      })
+    }
+  })
+}
+
+db.mongoose
+  .connect(
+    `mongodb+srv://${dbConfig.DB_USER}:${dbConfig.DB_PASSWORD}@cluster0.phykcn1.mongodb.net/?retryWrites=true&w=majority`,
+    {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    }
+  )
+  .then(() => {
+    console.log('Successfully connect to MongoDB.')
+    initial()
+  })
+  .catch((err) => {
+    console.error('Connection error', err)
+    process.exit()
+  })
 
 const app = express()
 const corsOption = {
