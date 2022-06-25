@@ -1,9 +1,10 @@
 import mongoose from 'mongoose'
+import User from './user.model'
 mongoose.Promise = global.Promise
 
 export default {
   mongoose: mongoose,
-  user: require('./user.model'),
+  user: User,
   role: require('./role.model'),
   ROLES: ['user', 'admin', 'moderator'],
 }
