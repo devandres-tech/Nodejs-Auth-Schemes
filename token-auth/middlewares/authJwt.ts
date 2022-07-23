@@ -49,10 +49,10 @@ const isModerator = (req: CustomRequest, res: Response, next: NextFunction) => {
           if (roles[i].name === 'moderator') next()
           return
         }
+        return res.status(403).send({ message: 'Require Moderator Role!' })
       }
     )
-    return res.status(403).send({ message: 'Require Moderator Role!' })
   })
 }
 
-export { verifyToken, isAdmin, isModerator }
+export default { verifyToken, isAdmin, isModerator }

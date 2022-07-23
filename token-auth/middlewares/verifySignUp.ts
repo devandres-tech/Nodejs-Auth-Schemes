@@ -46,4 +46,4 @@ const checkRolesExisted = (req: Request, res: Response, next: NextFunction) => {
   next()
 }
 
-export { checkDuplicateUsernameOrEmail, checkRolesExisted }
+export default { checkDuplicateUsernameOrEmail, checkRolesExisted }
