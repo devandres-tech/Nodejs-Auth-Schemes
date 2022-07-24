@@ -52,3 +52,36 @@ const signUp = async (req: Request, res: Response) => {
   }
   return res.status(200).send({ message: 'User was registered successfully!' })
 }
+
+const signIn = async (req: Request, res: Response) => {
+  let user: any
+  user = await User.findOne({ username: req.body.username }).exec()
+  try {
+  } catch (error) {
+    return res.status(500).send({ message: error })
+  }
+  if (!user) return res.status(404).send({ message: 'User not found' })
+  const passwordIsValid = bcrypt.compareSync(
+    req.body.password,
+    user.password as string
+  )
+  if (!passwordIsValid) {
+    return res
+      .status(401)
+      .send({ accessToken: null, message: 'Invalid password' })
+  }
+  const token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 })
+  let authorities: any = []
+  user.roles?.forEach((role: any) => {
+    authorities.push(`Role_${role.name.toUpperCase}`)
+  })
+  return res.status(200).send({
+    id: user._id,
+    username: user.username,
+    email: user.email,
+    roles: authorities,
+    accessToken: token,
+  })
+}
+
+export default { signUp, signIn }
