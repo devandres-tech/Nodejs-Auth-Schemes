@@ -19,40 +19,52 @@ const verifyToken = (req: CustomRequest, res: Response, next: NextFunction) => {
   })
 }
 
-const isAdmin = (req: CustomRequest, res: Response, next: NextFunction) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (err) return res.status(500).send({ message: err })
-    Role.find(
-      { _id: { $in: user?.roles } },
-      (err: any, roles: [{ name: string }]) => {
-        if (err) return res.status(500).send({ message: err })
-        for (let i = 0; i < roles.length; i++) {
-          if (roles[i].name === 'admin') {
-            next()
-            return
-          }
-        }
-        res.status(403).send({ message: 'Required Admin Role!' })
-      }
-    )
+const isAdmin = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  let user: any
+  try {
+    user = User.findById(req.userId).exec()
+  } catch (error) {
+    return res.status(500).send({ message: error })
+  }
+
+  let roles
+  try {
+    roles = await Role.find({ _id: { $in: user?.roles } })
+  } catch (error) {
+    return res.status(500).send({ message: error })
+  }
+  roles.forEach((role: any) => {
+    if (role.name === 'admin') return next()
   })
+  return res.status(403).send({ message: 'Admin role required' })
 }
 
-const isModerator = (req: CustomRequest, res: Response, next: NextFunction) => {
-  User.findById(req.userId).exec((err, user) => {
-    if (err) return res.status(500).send({ message: err })
-    Role.find(
-      { _id: { $in: user?.roles } },
-      (err: any, roles: [{ name: string }]) => {
-        if (err) return res.status(500).send({ message: err })
-        for (let i = 0; i < roles.length; i++) {
-          if (roles[i].name === 'moderator') next()
-          return
-        }
-        return res.status(403).send({ message: 'Require Moderator Role!' })
-      }
-    )
+const isModerator = async (
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) => {
+  let user
+  try {
+    user = await User.findById(req.userId).exec()
+  } catch (error) {
+    return res.status(500).send({ message: error })
+  }
+
+  let roles
+  try {
+    roles = Role.find({ _id: { $in: user?.roles } })
+  } catch (error) {
+    return res.status(500).send({ message: error })
+  }
+  roles.forEach((role: any) => {
+    if (role.name === 'moderator') return next()
   })
+  return res.status(403).send({ message: 'Moderator role required' })
 }
 
 export default { verifyToken, isAdmin, isModerator }
