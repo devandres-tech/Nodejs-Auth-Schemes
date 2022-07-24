@@ -3,45 +3,36 @@ import db from '../models'
 const ROLES = db.ROLES
 const User = db.user
 
-const checkDuplicateUsernameOrEmail = (
+const checkDuplicateUsernameOrEmail = async (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  User.findOne({ username: req.body.username }).exec(
-    (err: Error, user: typeof User) => {
-      if (err) {
-        res.status(500).send({ message: err })
-        return
-      }
-      if (user) {
-        res.status(400).send({ message: 'Failed! Username is already in use!' })
-        return
-      }
-    }
-  )
-  User.findOne({ email: req.body.email }).exec(
-    (err: Error, user: typeof User) => {
-      if (err) return res.status(500).send({ message: err })
-      if (user) {
-        res.status(400).send({ message: 'Failed! Email is already in use!' })
-        return
-      }
-      next()
-    }
-  )
+  let user
+  try {
+    user = await User.findOne({ username: req.body.username }).exec()
+  } catch (error) {
+    return res.status(500).send({ message: error })
+  }
+  if (user)
+    return res.status(400).send({ message: 'Username is already in use' })
+
+  try {
+    user = await User.findOne({ email: req.body.email }).exec()
+  } catch (error) {
+    return res.status(500).send({ message: error })
+  }
+  if (user) return res.status(400).send({ message: 'Email is already in user' })
+  next()
 }
 
 const checkRolesExisted = (req: Request, res: Response, next: NextFunction) => {
   if (req.body.roles) {
-    for (let i = 0; i < req.body.roles.length; i++) {
-      if (!ROLES.includes(req.body.roles[i])) {
-        res.status(400).send({
-          message: `Failed! Role ${req.body.roles[i]} does not exit!`,
-        })
-        return
+    req.body.roles.forEach((role: any) => {
+      if (!ROLES.includes(role)) {
+        return res.status(400).send({ message: `Role ${role} des not exist` })
       }
-    }
+    })
   }
   next()
 }
