@@ -84,4 +84,4 @@ const signIn = async (req: Request, res: Response) => {
   })
 }
 
-export default { signUp, signIn }
+export { signUp, signIn }

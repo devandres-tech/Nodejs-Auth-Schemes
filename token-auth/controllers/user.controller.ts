@@ -15,9 +15,4 @@ const moderatorBoard = (req: CustomRequest, res: Response) => {
   return res.status(200).send('Moderator content')
 }
 
-export default {
-  allAccess,
-  userBoard,
-  adminBoard,
-  moderatorBoard,
-}
+export { allAccess, userBoard, adminBoard, moderatorBoard }
