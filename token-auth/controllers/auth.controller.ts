@@ -7,7 +7,6 @@ const User = db.user
 const Role = db.role
 
 const signUp = async (req: Request, res: Response) => {
-  console.log('verify signup')
   if (!req.body.username || !req.body.email) {
     return res
       .status(200)
@@ -56,25 +55,27 @@ const signUp = async (req: Request, res: Response) => {
 
 const signIn = async (req: Request, res: Response) => {
   let user: any
-  user = await User.findOne({ username: req.body.username }).exec()
+  user = await User.findOne({ username: req.body.username })
+    .populate('roles', '-__v')
+    .exec()
   try {
   } catch (error) {
     return res.status(500).send({ message: error })
   }
-  if (!user) return res.status(404).send({ message: 'User not found' })
+  if (!user)
+    return res.status(404).send({ message: 'Invalid password or username' })
   const passwordIsValid = bcrypt.compareSync(
     req.body.password,
     user.password as string
   )
   if (!passwordIsValid) {
-    return res
-      .status(401)
-      .send({ accessToken: null, message: 'Invalid password' })
+    return res.status(401).send({ message: 'Invalid password or username' })
   }
+  console.log('USER', user)
   const token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 })
   let authorities: any = []
   user.roles?.forEach((role: any) => {
-    authorities.push(`Role_${role.name.toUpperCase}`)
+    authorities.push(`Role_${role.name.toUpperCase()}`)
   })
   return res.status(200).send({
     id: user._id,

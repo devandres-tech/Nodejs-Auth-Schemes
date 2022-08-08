@@ -14,14 +14,6 @@ router
     signUp
   )
 
-router
-  .route('/signin')
-  .post(
-    [
-      verifySignUp.checkDuplicateUsernameOrEmail,
-      verifySignUp.checkRolesExisted,
-    ],
-    signIn
-  )
+router.route('/signin').post(signIn)
 
 export default router

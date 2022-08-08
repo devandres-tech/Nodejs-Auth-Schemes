@@ -57,7 +57,7 @@ const isModerator = async (
 
   let roles
   try {
-    roles = Role.find({ _id: { $in: user?.roles } })
+    roles = await Role.find({ _id: { $in: user?.roles } })
   } catch (error) {
     return res.status(500).send({ message: error })
   }

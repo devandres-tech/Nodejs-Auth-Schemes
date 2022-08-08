@@ -1,4 +1,5 @@
-import { Express } from 'express'
+import express from 'express'
+const router = express.Router()
 
 import { authJwt } from '../middlewares'
 import {
@@ -8,22 +9,11 @@ import {
   userBoard,
 } from '../controllers/user.controller'
 
-const userRoute = (app: Express) => {
-  app.use((req, res, next) => {
-    res.header(
-      'Access-Control-Allow-Headers',
-      'x-access-token, Origin, Content-Type, Accept'
-    )
-    next()
-  })
-  app.get('/api/test/all', allAccess)
-  app.get('/api/test/user', [authJwt.verifyToken], userBoard)
-  app.get(
-    '/api/test/mod',
-    [authJwt.verifyToken, authJwt.isModerator],
-    moderatorBoard
-  )
-  app.get('api/test/admin', [authJwt.verifyToken, authJwt.isAdmin], adminBoard)
-}
+router.route('/all').get(allAccess)
+router.route('/user').get([authJwt.verifyToken], userBoard)
+router
+  .route('/mod')
+  .get([authJwt.verifyToken, authJwt.isModerator], moderatorBoard)
+router.route('/admin').get([authJwt.verifyToken, authJwt.isAdmin], adminBoard)
 
-export default userRoute
+export default router

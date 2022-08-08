@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import cors from 'cors'
 
 import authRoutes from './routes/auth.routes'
+import userRoutes from './routes/user.routes'
 import db from './models'
 import dbConfig from './config/db.config'
 const Role = db.role
@@ -85,6 +86,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to token based auth' })
 })
 app.use('/api/auth', authRoutes)
+app.use('/api/test', userRoutes)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => {
