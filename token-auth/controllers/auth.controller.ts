@@ -7,6 +7,7 @@ const User = db.user
 const Role = db.role
 
 const signUp = async (req: Request, res: Response) => {
+  console.log('verify signup')
   if (!req.body.username || !req.body.email) {
     return res
       .status(200)

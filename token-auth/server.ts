@@ -1,6 +1,8 @@
 import express from 'express'
 import dotenv from 'dotenv'
 import cors from 'cors'
+
+import authRoutes from './routes/auth.routes'
 import db from './models'
 import dbConfig from './config/db.config'
 const Role = db.role
@@ -70,10 +72,19 @@ app.use(express.json())
 // parse requests of content-type: application/x-www-form-urlencoded
 app.use(express.urlencoded({ extended: true }))
 
+app.use((req, res, next) => {
+  res.header(
+    'Access-Control-Allow-Headers',
+    'x-access-token, Origin, Content-Type, Accept'
+  )
+  next()
+})
+
 // routes
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome to token based auth' })
 })
+app.use('/api/auth', authRoutes)
 
 const PORT = process.env.PORT || 8000
 app.listen(PORT, () => {
